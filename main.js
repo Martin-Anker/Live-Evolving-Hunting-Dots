@@ -15,4 +15,8 @@ function draw () {
     Population1.points[i].calculateFitness();
   }
   Goal1.drawMe();
+
+  if (Population1.allPointsDead = true) {
+
+  }
 }
