@@ -1,5 +1,6 @@
 class Point {
   constructor (x, y) {
+    this.brain = new Brain(200);
     this.pos = createVector(x, y);
     this.vel = createVector(0, 0);
     this.acc = createVector(0, 0);
@@ -9,7 +10,6 @@ class Point {
 
     this.fitness = 0;
     this.step = 0;
-    this.brain = new Brain(200);
   }
 
   moveStep (x, y) {
@@ -57,7 +57,7 @@ class Point {
       var distancetoGoal = dist(this.pos.x, this.pos.x, x, y);
       this.fitness = 1 / (distancetoGoal * distancetoGoal);
     //}
-    print("My fitness is = " + this.fitness)
+    //print("My fitness is = " + this.fitness)
   }
 
   giveBaby (startPos) {

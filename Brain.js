@@ -12,8 +12,9 @@ class Brain {
     //print(rand);
     for (var i = 0; i < 200; i++) {
       var rand = random(1);
-      if (rand < this.mutationRate) {
-        this.VectorList[i] = p5.Vector.fromAngle(radians(random(0, 360)));
+      if (rand <= this.mutationRate) {
+        var randomangle = random(0, 360);
+        this.VectorList[i] = p5.Vector.fromAngle(radians(randomangle));
       }
     }
   }
