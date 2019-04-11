@@ -1,6 +1,5 @@
 class Population {
-  constructor (size, x, y, StartPos) {
-    this.StartPos;
+  constructor (size, x, y) {
     this.points = []
     this.size = size;
     this.allPointsDead = false;
