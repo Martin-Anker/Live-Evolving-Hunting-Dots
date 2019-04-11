@@ -2,21 +2,28 @@ var Canvas;
 var Population1;
 var Goal1;
 
+var StartPos;
+
 function setup () {
+  StartPos = createVector(400, 400)
   Canvas = createCanvas(800, 800);
-  Population1 = new Population(200, 50, 50);
-  Goal1 = new Goal(width/2, height/4);
+  Goal1 = new Goal(width/2, height/8);
+  Population1 = new Population(200, 400, 700, StartPos);
 }
 
 function draw () {
   background(200);
-  for (var i = 0; i < Population1.size; i++) {
-    Population1.points[i].moveStep();
-    Population1.points[i].calculateFitness();
+
+  if (Population1.testAllDotsDead() == false) {
+    for (var i = 0; i < Population1.size; i++) {
+      Population1.points[i].moveStep(Goal1.pos.x, Goal1.pos.y);
+    }
+    Goal1.drawMe();
   }
-  Goal1.drawMe();
-
-  if (Population1.allPointsDead = true) {
-
+  else {
+    Population1.calculateFitness(Goal1.pos.x, Goal1.pos.y);
+    Population1.naturalSelection();
+    Population1.mutate();
+    print(Population1.points.length);
   }
 }
