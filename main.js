@@ -56,7 +56,7 @@ function createMenu () {
     SpeedSlider.position(width + 20, 10);
     SpeedSlider.style('width', '140px');
 
-    MutationSlider = createSlider(0, 255, 20);
+    MutationSlider = createSlider(0, 255, 10);
     MutationSlider.position(width + 20, 40);
     MutationSlider.style('width', '140px');
 

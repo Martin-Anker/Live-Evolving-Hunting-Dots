@@ -7,6 +7,7 @@ class Population {
     this.gen = 1;
     this.fitnessSum = 0;
     this.bestPoint = 0;
+    this.minStep = 1000;
 
     for (var i = 0; i < this.size; i++) {
       this.points.push(new Point());
@@ -15,9 +16,19 @@ class Population {
 
   updateAll (ObstListe, GoalPos) {
     for (var i = 1; i < this.size; i++) {
-      this.points[i].update(ObstListe, GoalPos);
+      if (this.points[i].brain.step > this.minStep) {
+        this.points[i].dead = true;
+      }
+      else {
+        this.points[i].update(ObstListe, GoalPos);
+      }
     }
-    this.points[0].update(ObstListe, GoalPos);
+    if (this.points[0].brain.step > this.minStep) {
+      this.points[0].dead = true;
+    }
+    else {
+      this.points[0].update(ObstListe, GoalPos);
+    }
   }
 
   allDotsDead() {
@@ -65,7 +76,7 @@ class Population {
   }
 
   mutate (MutVal) {
-    for (var i = 0; i < this.size; i++) {
+    for (var i = 1; i < this.size; i++) {
       this.points[i].brain.mutate(MutVal);
     }
   }
@@ -99,6 +110,10 @@ class Population {
       }
     }
     this.bestPoint = BestDotIndex;
+
+    if (this.points[this.bestPoint].reachedGoal) {
+      this.minStep = this.points[this.bestPoint].brain.step;
+    }
   }
 
 }
