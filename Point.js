@@ -73,7 +73,7 @@ class Point {
       this.fitness = 1 / 16 + 10000 / (this.brain.step * this.brain.step);
     }
     else {
-      var dist2goal = dist(this.pos.x, this.pos.y, 400, 50);
+      var dist2goal = dist(this.pos.x, this.pos.y, GoalPos.x, GoalPos.y);
       this.fitness = 1 / (dist2goal * dist2goal);
     }
   }
