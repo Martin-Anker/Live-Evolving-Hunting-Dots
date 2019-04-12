@@ -1,35 +1,81 @@
 class Population {
-  constructor (size, x, y) {
-    this.points = []
+  constructor (size, GoalPos) {
+    this.GoalPos = GoalPos;
+    this.points = [];
     this.size = size;
     this.allPointsDead = false;
     this.gen = 1;
-
     this.fitnessSum = 0;
+    this.bestPoint = 0;
 
-    for (var i = 0; i < size; i++) {
-      this.points.push(new Point(x, y));
+    for (var i = 0; i < this.size; i++) {
+      this.points.push(new Point());
     }
   }
 
-  testAllDotsDead () {
-    var p = 0;
+  updateAll (ObstListe, GoalPos) {
+    for (var i = 1; i < this.size; i++) {
+      this.points[i].update(ObstListe, GoalPos);
+    }
+    this.points[0].update(ObstListe, GoalPos);
+  }
+
+  allDotsDead() {
     for (var i = 0; i < this.size; i++) {
-      if (this.points[i].dead == false) {
-        p++;
+      if (!this.points[i].dead && !this.points[i].reachedGoal) {
+        return false;
       }
     }
-    if (p == 0) {
-      return true;
+    return true;
+  }
+
+  //--------------------------------------------------------------------------
+  //Genetic Stuff
+
+  naturalSelection () {
+    var newPoints = [];
+
+    this.setBestPoint();
+
+    this.calculateFitnessSum();
+
+
+    newPoints[0] = this.points[this.bestPoint].giveBaby();
+    for (var i = 1; i < this.size; i++) {
+      var parent = this.selectParent();
+      newPoints[i] = parent.giveBaby();
     }
-    else {
-      return false;
+    this.points = newPoints;
+    this.points[0].isBest = true;
+    this.gen++;
+    print("Generation: " + this.gen);
+  }
+
+  selectParent() {
+    var rand = random(0, this.fitnessSum);
+    var runningSum = 0;
+
+    for (var i = 0; i < this.size; i++) {
+      runningSum += this.points[i].fitness;
+      if (runningSum > rand) {
+        return this.points[i];
+      }
+    }
+    return null;
+  }
+
+  mutate (MutVal) {
+    for (var i = 0; i < this.size; i++) {
+      this.points[i].brain.mutate(MutVal);
     }
   }
 
-  calculateFitness (x, y) {
-    for (var i = 0; i < this.points.length; i++) {
-      this.points[i].calculateFitness(x, y);
+  //---------------------------------------------------------------------------
+  //fitnessStuff
+
+  calculateAllFitness (GoalPos) {
+    for (var i = 0; i < this.size; i++) {
+      this.points[i].calculateFitness(GoalPos);
     }
   }
 
@@ -40,40 +86,19 @@ class Population {
     }
   }
 
-  naturalSelection() {
-    var newPoints = [];
+  //---------------------------------------------------------------------------
+  //Best Dot
 
-    this.calculateFitnessSum();
-
-
+  setBestPoint () {
+    var max = 0;
+    var BestDotIndex = 0;
     for (var i = 0; i < this.size; i++) {
-      var parent = this.selectParent();
-      newPoints[i] = parent.giveBaby(this.StartPos);
-    }
-    this.points = newPoints;
-    this.gen++;
-    print("Generation: " + this.gen);
-  }
-
-  selectParent() {
-    var rand = random(0, this.fitnessSum);
-
-    var runningSum = 0;
-
-    for (var i = 0; i < this.size; i++) {
-      runningSum += this.points[i].fitness;
-      if (runningSum > rand) {
-        //print("i = " + i);
-        return this.points[i];
+      if (this.points[i].fitness > max) {
+        max = this.points[i].fitness;
+        BestDotIndex = i;
       }
     }
-    return null;
-  }
-
-  mutate () {
-    for (var i = 0; i < this.size; i++) {
-      this.points[i].brain.mutate();
-    }
+    this.bestPoint = BestDotIndex;
   }
 
 }

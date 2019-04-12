@@ -1,68 +1,86 @@
 class Point {
-  constructor (x, y) {
-    this.brain = new Brain(200);
-    this.pos = createVector(x, y);
+  constructor () {
+    this.brain = new Brain(400);
+    this.pos = createVector(400, 700);
     this.vel = createVector(0, 0);
     this.acc = createVector(0, 0);
 
-    this.reachedGoal = false;
-    this.dead = false;
-
     this.fitness = 0;
-    this.step = 0;
+    this.dead = false;
+    this.reachedGoal = false;
+    this.isBest = false;
   }
 
-  moveStep (x, y) {
-    if (dist(this.pos.x, this.pos.y, x, y) < 10) {
+  update (ObstListe, GoalPos) {
+    if (!this.dead && !this.reachedGoal) {
+      this.move();
+
+    if (this.pos.x < 2 || this.pos.y < 2 || this.pos.x > width - 2 || this.pos.y > height - 2) {
+      this.dead = true;
+    }
+
+    for (var i = 0; i < ObstListe.length; i++) {
+      if (this.pos.x > ObstListe[i].pos.x && this.pos.x < ObstListe[i].pos.x + ObstListe[i].width && this.pos.y > ObstListe[i].pos.y && this.pos.y < ObstListe[i].pos.y + ObstListe[i].height) { // || this.pos.y < ObstListe[i].pos.y && this.pos.y > ObstListe[i].pos.y + ObstListe[i].height
+        this.dead = true;
+      }
+    }
+
+    if (dist(this.pos.x, this.pos.y, GoalPos.x, GoalPos.y) < 18) {
       this.reachedGoal = true;
-      this.dead = true;
-    }
-    if (this.pos.x < 2|| this.pos.y < 2 || this.pos.x > width - 2 || this.pos.y > height -2) {
-      this.dead = true;
     }
 
-    if (this.step < this.brain.VectorList.length && !this.dead) {
-      this.acc = this.brain.VectorList[this.step];
-      this.step++;
+
+  }
+    this.show();
+  }
+
+  move () {
+    if (this.brain.step < this.brain.length) {
+      this.acc = this.brain.VectorList[this.brain.step];
+      this.brain.step++;
     }
     else {
       this.dead = true;
-      this.vel = createVector(0, 0);
-      this.acc = createVector(0, 0);
     }
 
-      this.vel.add(this.acc);
-      this.vel.limit(5);
-      this.pos.add(this.vel);
+    this.vel.add(this.acc);
+    this.vel.limit(5);
+    this.pos.add(this.vel);
 
-    this.drawthis();
   }
 
-  drawthis () {
-    if (this.dead == false) {
+  show () {
+    strokeWeight(0);
+    if (this.isBest == true) {
+      fill('rgb(0,255,0)');
+      ellipse(this.pos.x, this.pos.y, 6, 6);
+    }
+    else if (this.dead == true || this.reachedGoal == true) {
+      fill(120);
+      ellipse(this.pos.x, this.pos.y, 6, 6);
+    }
+    else {
       fill(0);
-      ellipse(this.pos.x, this.pos.y, 10, 10);
+      ellipse(this.pos.x, this.pos.y, 6, 6);
+    }
+  }
+
+  //--------------------------------------------------------------------------
+  //Genetic Stuff
+
+  calculateFitness (GoalPos) {
+    if (this.reachedGoal) {
+      this.fitness = 1 / 16 + 10000 / (this.brain.step * this.brain.step);
     }
     else {
-      fill(80);
-      ellipse(this.pos.x, this.pos.y, 10, 10);
+      var dist2goal = dist(this.pos.x, this.pos.y, 400, 50);
+      this.fitness = 1 / (dist2goal * dist2goal);
     }
   }
 
-  calculateFitness (x, y) {
-    //if (this.reachedGoal == true) {
-    //  this.fitness = 0.01;
-  //  }
-    //else {
-      var distancetoGoal = dist(this.pos.x, this.pos.x, x, y);
-      this.fitness = 1 / (distancetoGoal * distancetoGoal);
-    //}
-    //print("My fitness is = " + this.fitness)
-  }
-
-  giveBaby (startPos) {
-    var Baby = new Point(400, 700);
-    Baby.brain = this.brain;
+  giveBaby () {
+    var Baby = new Point();
+    Baby.brain = this.brain.clone();
     return Baby;
   }
 
